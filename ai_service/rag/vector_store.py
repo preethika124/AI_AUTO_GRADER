@@ -1,6 +1,10 @@
-import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
+
+try:
+    import faiss  # type: ignore
+except Exception:
+    faiss = None
 
 model = None
 
@@ -32,10 +36,13 @@ def build_index():
     if len(embeddings) == 0:
         return
 
-    vectors = np.array(embeddings)
+    vectors = np.array(embeddings, dtype=np.float32)
+
+    if faiss is None:
+        index = vectors
+        return
 
     index = faiss.IndexFlatL2(vectors.shape[1])
-
     index.add(vectors)
 
 
@@ -44,9 +51,14 @@ def search(query, k=3):
     if index is None:
         return []
 
-    q_emb = get_model().encode([query])
+    q_emb = np.array(get_model().encode([query]), dtype=np.float32)
 
-    distances, ids = index.search(np.array(q_emb), k)
+    if faiss is None:
+        dists = np.linalg.norm(index - q_emb[0], axis=1)
+        ids = np.argsort(dists)[:k]
+        return [documents[i] for i in ids if i < len(documents)]
+
+    distances, ids = index.search(q_emb, k)
 
     results = []
 
