@@ -1,6 +1,5 @@
 const axios = require("axios");
 const FormData = require("form-data");
-const fs=require("fs");
 
 
 const AI_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
@@ -21,9 +20,14 @@ exports.uploadAnswerKey = async (file)=>{
 
 const form = new FormData()
 
+if (!file) {
+  throw new Error("File not uploaded");
+}
+
 form.append(
 "file",
-fs.createReadStream(file.path)
+file.buffer,
+file.originalname || "answer-key.pdf"
 )
 
 const response = await axios.post(
