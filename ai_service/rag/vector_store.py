@@ -1,5 +1,7 @@
 import numpy as np
 from sentence_transformers import SentenceTransformer
+import os
+from huggingface_hub import login
 
 try:
     import faiss  # type: ignore
@@ -17,6 +19,9 @@ index = None
 def get_model():
     global model
     if model is None:
+        hf_token = os.getenv("HF_TOKEN") or os.getenv("HUGGINGFACEHUB_API_TOKEN")
+        if hf_token:
+            login(token=hf_token, add_to_git_credential=False)
         model = SentenceTransformer("all-MiniLM-L6-v2")
     return model
 
