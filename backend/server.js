@@ -17,6 +17,7 @@ const authRoutes = require("./routes/authRoutes");
 
 
 const app = express();
+const PORT = Number(process.env.PORT) || 5000;
 
 const llmLimiter = rateLimit({
   windowMs: 60 * 1000,
@@ -28,18 +29,34 @@ const llmLimiter = rateLimit({
   },
 });
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "http://127.0.0.1:3000",
-];
+const normalizeOrigin = (value) =>
+  String(value || "")
+    .trim()
+    .replace(/\/+$/, "");
+
+const allowedOrigins = (
+  process.env.CORS_ORIGIN ||
+  "http://localhost:3000,http://127.0.0.1:3000"
+)
+  .split(",")
+  .map(normalizeOrigin)
+  .filter(Boolean);
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin) {
         callback(null, true);
         return;
       }
+
+      const normalizedOrigin = normalizeOrigin(origin);
+
+      if (allowedOrigins.includes(normalizedOrigin)) {
+        callback(null, true);
+        return;
+      }
+
       callback(new Error("Not allowed by CORS"));
     },
     credentials: true,
@@ -76,6 +93,6 @@ app.use("/api/auth", authRoutes);
 
 
 
-app.listen(5000, () => {
-  console.log("Backend server running on port 5000");
+app.listen(PORT, () => {
+  console.log(`Backend server running on port ${PORT}`);
 });
