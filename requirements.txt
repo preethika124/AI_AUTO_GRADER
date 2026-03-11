@@ -16,9 +16,15 @@ opencv-python
 numpy
 PyMuPDF
 
-spacy
 scikit-learn
 transformers
 torch==2.10.0+cpu
 sentence-transformers
 keybert
+huggingface_hub
+
+# Optional: install for faster vector search if supported on your platform.
+# faiss-cpu
+
+# Optional: keep only if you use spaCy-based features.
+spacy

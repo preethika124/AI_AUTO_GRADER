@@ -96,16 +96,11 @@ exports.login = async (req,res)=>{
       { expiresIn: "7d" }
     );
 
-    const isProd = process.env.NODE_ENV === "production";
-
-    const cookieOptions = {
-      httpOnly: true,
-      secure: isProd,
-      sameSite: isProd ? "none" : "lax",
-      path: "/",
-    };
-
-    res.cookie("token", token, cookieOptions);
+    res.cookie("token", token, {
+      httpOnly:true,
+      sameSite:"lax",
+      secure:false
+    });
 
     res.json({
       message:"Login successful",
@@ -129,14 +124,7 @@ exports.login = async (req,res)=>{
 
 
 exports.logout = (req,res)=>{
-  const isProd = process.env.NODE_ENV === "production";
-
-  res.clearCookie("token", {
-    httpOnly: true,
-    secure: isProd,
-    sameSite: isProd ? "none" : "lax",
-    path: "/",
-  });
+  res.clearCookie("token");
 
   res.json({
     message:"Logged out"

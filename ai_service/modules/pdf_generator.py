@@ -1,5 +1,6 @@
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
+from reportlab.lib.utils import simpleSplit
 import os
 import uuid
 
@@ -22,6 +23,11 @@ def generate_question_pdf(questions):
 
     y -= 40
 
+    left_margin = 50
+    right_margin = 50
+    max_text_width = width - left_margin - right_margin
+    line_height = 18
+
     total_marks = sum(int(q["marks"]) for q in questions)
 
     c.setFont("Helvetica", 12)
@@ -30,19 +36,26 @@ def generate_question_pdf(questions):
 
         question = q["question"]
         marks = int(q["marks"])
+        line_text = f"Q{i+1}. {question} ({marks} marks)"
+        wrapped_lines = simpleSplit(line_text, "Helvetica", 12, max_text_width)
 
-        c.drawString(50, y, f"Q{i+1}. {question} ({marks} marks)")
+        for line in wrapped_lines:
+            if y < 100:
+                c.showPage()
+                c.setFont("Helvetica", 12)
+                y = height - 60
+            c.drawString(left_margin, y, line)
+            y -= line_height
 
-        y -= 30
-
-        if y < 100:
-            c.showPage()
-            c.setFont("Helvetica", 12)
-            y = height - 60
+        y -= 8
 
     c.setFont("Helvetica-Bold", 14)
 
-    c.drawString(50, y - 20, f"Total Marks: {total_marks}")
+    if y < 100:
+        c.showPage()
+        y = height - 60
+
+    c.drawString(left_margin, y - 20, f"Total Marks: {total_marks}")
 
     c.save()
 

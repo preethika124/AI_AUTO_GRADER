@@ -4,6 +4,7 @@ import API from "../services/api";
 function RagUploader() {
 
   const [files, setFiles] = useState([]);
+  const [uploading, setUploading] = useState(false);
 
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
@@ -16,6 +17,7 @@ function RagUploader() {
       alert("Please select PDFs first");
       return;
     }
+    if (uploading) return;
 
     const formData = new FormData();
 
@@ -24,6 +26,8 @@ function RagUploader() {
     });
 
     try {
+      setUploading(true);
+
       await API.post("/upload-rag-documents", formData, {
         headers: { "Content-Type": "multipart/form-data" }
       });
@@ -32,6 +36,8 @@ function RagUploader() {
     } catch (error) {
       console.error("Upload error:", error);
       alert("Upload failed: " + error.message);
+    } finally {
+      setUploading(false);
     }
 
   };
@@ -78,9 +84,16 @@ function RagUploader() {
       <button
         className="mt-5 bg-blue-500 hover:bg-blue-600 px-5 py-2 rounded-lg text-white font-medium transition"
         onClick={uploadFiles}
+        disabled={uploading}
       >
-        Upload PDFs
+        {uploading ? "Uploading..." : "Upload PDFs"}
       </button>
+
+      {uploading && (
+        <p className="mt-3 text-sm text-slate-300">
+          Upload in progress. Please wait...
+        </p>
+      )}
 
     </div>
 

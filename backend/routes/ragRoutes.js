@@ -3,7 +3,7 @@ const multer = require("multer");
 const axios = require("axios");
 const FormData = require("form-data");
 const authMiddleware = require("../middleware/auth");
-const AI_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
+const AI_URL = "http://localhost:8000";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -53,9 +53,21 @@ router.post("/upload-rag-documents", authMiddleware, upload.array("files"), asyn
   } catch (err) {
 
     console.error("RAG Upload Error:", err.response?.data || err);
+    if (err.response) {
+      return res.status(err.response.status || 502).json({
+        error: "RAG upload failed",
+        upstream: err.response.data || null,
+      });
+    }
+
+    if (err.code === "ECONNREFUSED") {
+      return res.status(503).json({
+        error: "AI service is not reachable at http://localhost:8000",
+      });
+    }
 
     res.status(500).json({
-      error: "RAG upload failed"
+      error: err.message || "RAG upload failed"
     });
 
   }

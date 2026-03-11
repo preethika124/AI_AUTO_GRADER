@@ -9,6 +9,10 @@ import os
 tesseract_cmd = os.getenv("TESSERACT_CMD")
 if tesseract_cmd:
     pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
+elif os.name == "nt":
+    default_windows_path = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+    if os.path.exists(default_windows_path):
+        pytesseract.pytesseract.tesseract_cmd = default_windows_path
 
 
 def extract_text_from_pdf(pdf_path):

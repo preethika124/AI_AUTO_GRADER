@@ -2,7 +2,7 @@ const axios = require("axios");
 const FormData = require("form-data");
 
 
-const AI_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
+const AI_URL = "http://localhost:8000";
 
 
 
