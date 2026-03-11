@@ -2,7 +2,7 @@ const router = require("express").Router();
 const multer = require("multer");
 const axios = require("axios");
 const FormData = require("form-data");
-const authMiddleware = require("../middleware/authMiddleware");
+const authMiddleware = require("../middleware/auth");
 const AI_URL = process.env.AI_SERVICE_URL || "http://localhost:8000";
 
 const upload = multer({
