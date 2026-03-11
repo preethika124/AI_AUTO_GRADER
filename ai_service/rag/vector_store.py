@@ -2,7 +2,7 @@ import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
 
-model = SentenceTransformer("all-MiniLM-L6-v2")
+model = None
 
 documents = []
 embeddings = []
@@ -10,9 +10,16 @@ embeddings = []
 index = None
 
 
+def get_model():
+    global model
+    if model is None:
+        model = SentenceTransformer("all-MiniLM-L6-v2")
+    return model
+
+
 def add_document(text):
 
-    emb = model.encode(text)
+    emb = get_model().encode(text)
 
     documents.append(text)
     embeddings.append(emb)
@@ -37,7 +44,7 @@ def search(query, k=3):
     if index is None:
         return []
 
-    q_emb = model.encode([query])
+    q_emb = get_model().encode([query])
 
     distances, ids = index.search(np.array(q_emb), k)
 

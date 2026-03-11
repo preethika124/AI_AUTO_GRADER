@@ -2,9 +2,13 @@ from pdf2image import convert_from_path
 import pytesseract
 import cv2
 import numpy as np
+import os
 
-# Set tesseract path (change if different)
-pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
+# Optional override for platforms where tesseract is not in PATH.
+# Example: TESSERACT_CMD=/usr/bin/tesseract
+tesseract_cmd = os.getenv("TESSERACT_CMD")
+if tesseract_cmd:
+    pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
 
 
 def extract_text_from_pdf(pdf_path):

@@ -11,6 +11,8 @@ pdf2image
 pytesseract
 Pillow
 opencv-python
+numpy
+PyMuPDF
 
 spacy
 scikit-learn
@@ -18,3 +20,4 @@ transformers
 torch
 sentence-transformers
 keybert
+faiss-cpu
